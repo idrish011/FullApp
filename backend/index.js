@@ -60,6 +60,32 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGIN
 const db = new Database();
 const security = new SecurityMiddleware();
 
+// --- Super Admin Auto-Creation Logic ---
+const AuthMiddleware = require('./middleware/auth');
+const auth = new AuthMiddleware();
+(async function ensureSuperAdmin() {
+  try {
+    const existingAdmin = await db.get('SELECT id FROM users WHERE email = ?', ['admin@campuslink.com']);
+    if (!existingAdmin) {
+      const userId = require('uuid').v4();
+      const passwordHash = await auth.hashPassword('admin123');
+      await db.run(
+        `INSERT INTO users (
+          id, college_id, username, email, password_hash, first_name, last_name, 
+          role, phone, date_of_birth, gender, address
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [userId, null, 'admin', 'admin@campuslink.com', passwordHash, 'Super', 'Admin', 
+         'super_admin', null, null, null, null]
+      );
+      console.log('Default super admin created: admin@campuslink.com / admin123');
+    } else {
+      console.log('Default super admin already exists');
+    }
+  } catch (error) {
+    console.error('Error ensuring super admin:', error);
+  }
+})();
+
 // Enhanced security middleware setup
 app.use(helmet({
   contentSecurityPolicy: {
