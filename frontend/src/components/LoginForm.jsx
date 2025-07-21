@@ -188,17 +188,6 @@ const LoginForm = () => {
             )}
           </Button>
 
-          <Box sx={{ textAlign: 'center', mt: 2 }}>
-            <Typography variant="body2" color="text.secondary">
-              Demo Credentials:
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Email: admin@campuslink.com
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Password: Admin123!
-            </Typography>
-          </Box>
         </Box>
       </Paper>
     </Box>
